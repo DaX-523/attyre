@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["tracing"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Size {
+  S
+  M
+  L
+  XL
+}
+
+enum Color {
+  RED
+  BLUE
+  GREEN
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  username        String    @unique
+  displayName     String
+  profilePicture  String?
+  bio             String?
+  followersCount  Int       @default(0)
+  verified        Boolean   @default(false)
+  videos          Video[]   // One-to-Many with Video
+  createdAt       DateTime  @default(now())
+}
+
+model Product {
+  id              Int       @id @default(autoincrement())
+  name            String
+  price           Float
+  originalPrice   Float?
+  discount        Int?
+  imageUrl        String
+  inStock         Boolean   @default(true)
+  currency        String    @default("USD")
+  timestamp       Int
+  storeId         Int?      // Foreign key to Store
+  store           Store?    @relation(fields: [storeId], references: [id])
+  variants        Variant[] // One-to-Many with Variants
+  videos          VideoProduct[] // Many-to-Many with Video
+  createdAt       DateTime  @default(now())
+}
+
+model Variant {
+  id              Int       @id @default(autoincrement())
+  productId       Int
+  name            String
+  sizeOptions     Size[]
+  colorOptions    Color[]
+  product         Product   @relation(fields: [productId], references: [id])
+}
+
+model Store {
+  id              Int       @id @default(autoincrement())
+  name            String
+  logoUrl         String?
+  products        Product[] // One-to-Many with Product
+}
+
+model Video {
+  id              Int       @id @default(autoincrement())
+  videoUrl        String
+  thumbnailUrl    String?
+  description     String?
+  viewCount       Int       @default(0)
+  duration        Int
+  userId          Int       // Foreign key to User
+  likesCount      Int       @default(0)
+  commentsCount   Int       @default(0)
+  sharesCount     Int       @default(0)
+  isLiked         Boolean   @default(false)
+  isBookmarked    Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  musicId         Int?      // Foreign key to Music
+
+  user            User      @relation(fields: [userId], references: [id])
+  products        VideoProduct[] // Many-to-Many with Product
+  music           Music?    @relation(fields: [musicId], references: [id])
+  hashtags        String[]  // Store hashtags as array
+}
+
+model VideoProduct {
+  videoId         Int
+  productId       Int
+
+  video           Video     @relation(fields: [videoId], references: [id])
+  product         Product   @relation(fields: [productId], references: [id])
+
+  @@id([videoId, productId])  // Composite primary key
+}
+
+model Music {
+  id              Int       @id @default(autoincrement())
+  name            String
+  artist          String
+  coverUrl        String?
+  videos          Video[]   // One-to-Many with Video
+}
