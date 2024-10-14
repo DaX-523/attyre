@@ -4,4 +4,4 @@ const dataController = require("../controllers/fetch");
 
 router.get("/", dataController.fetch);
 
-module.export = router;
+module.exports = router;

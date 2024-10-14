@@ -28,86 +28,87 @@ enum Color {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  username        String    @unique
-  displayName     String
-  profilePicture  String?
-  bio             String?
-  followersCount  Int       @default(0)
-  verified        Boolean   @default(false)
-  videos          Video[]   // One-to-Many with Video
-  createdAt       DateTime  @default(now())
+  id               Int      @id 
+  username         String   @unique
+  display_name     String
+  profile_picture_url String?
+  bio              String?
+  followers_count  Int      @default(0)
+  verified         Boolean  @default(false)
+  videos           Video[]
+  created_at       DateTime @default(now())
 }
 
+
+
 model Product {
-  id              Int       @id @default(autoincrement())
-  name            String
-  price           Float
-  originalPrice   Float?
-  discount        Int?
-  imageUrl        String
-  inStock         Boolean   @default(true)
-  currency        String    @default("USD")
-  timestamp       Int
-  storeId         Int?      // Foreign key to Store
-  store           Store?    @relation(fields: [storeId], references: [id])
-  variants        Variant[] // One-to-Many with Variants
-  videos          VideoProduct[] // Many-to-Many with Video
-  createdAt       DateTime  @default(now())
+  id               Int      @id 
+  name             String
+  price            Float
+  original_price   Float?
+  discount_percentage Int?
+  image_url        String
+  timestamp        Int
+  in_stock         Boolean  @default(true)
+  currency         String   @default("USD")
+  store_id         Int?     
+  store            Store?   @relation(fields: [store_id], references: [id])
+  variants         Variant[]
+  videos           VideoProduct[]
 }
 
 model Variant {
-  id              Int       @id @default(autoincrement())
-  productId       Int
-  name            String
-  sizeOptions     Size[]
-  colorOptions    Color[]
-  product         Product   @relation(fields: [productId], references: [id])
-}
-
-model Store {
-  id              Int       @id @default(autoincrement())
-  name            String
-  logoUrl         String?
-  products        Product[] // One-to-Many with Product
+  id               Int      @id 
+  product_id       Int
+  name             String
+  size_options     Size[]
+  color_options    Color[]
+  product          Product  @relation(fields: [product_id], references: [id])
 }
 
 model Video {
-  id              Int       @id @default(autoincrement())
-  videoUrl        String
-  thumbnailUrl    String?
-  description     String?
-  viewCount       Int       @default(0)
-  duration        Int
-  userId          Int       // Foreign key to User
-  likesCount      Int       @default(0)
-  commentsCount   Int       @default(0)
-  sharesCount     Int       @default(0)
-  isLiked         Boolean   @default(false)
-  isBookmarked    Boolean   @default(false)
-  createdAt       DateTime  @default(now())
-  musicId         Int?      // Foreign key to Music
+  id               Int      @id 
+  video_url        String
+  thumbnail_url    String?
+  description      String?
+  view_count       Int      @default(0)
+  duration         Int
+  user_id          Int      
+  likes_count      Int      @default(0)
+  comments_count   Int      @default(0)
+  shares_count     Int      @default(0)
+  is_liked         Boolean  @default(false)
+  is_bookmarked    Boolean  @default(false)
+  created_at       DateTime @default(now())
+  music_id         Int?     
 
-  user            User      @relation(fields: [userId], references: [id])
-  products        VideoProduct[] // Many-to-Many with Product
-  music           Music?    @relation(fields: [musicId], references: [id])
-  hashtags        String[]  // Store hashtags as array
+  user             User     @relation(fields: [user_id], references: [id])
+  products         VideoProduct[]
+  music            Music?   @relation(fields: [music_id], references: [id])
+  hashtags         String[] 
 }
 
 model VideoProduct {
-  videoId         Int
-  productId       Int
+  video_id         Int
+  product_id       Int
 
-  video           Video     @relation(fields: [videoId], references: [id])
-  product         Product   @relation(fields: [productId], references: [id])
+  video            Video    @relation(fields: [video_id], references: [id])
+  product          Product  @relation(fields: [product_id], references: [id])
 
-  @@id([videoId, productId])  // Composite primary key
+  @@id([video_id, product_id])  // Composite primary key
 }
 
 model Music {
-  id              Int       @id @default(autoincrement())
-  name            String
-  artist          String
-  coverUrl        String?
-  videos          Video[]   // One-to-Many with Video
+  id               Int      @id 
+  name             String
+  artist           String
+  cover_url        String?
+  videos           Video[]
+}
+
+model Store {
+  id        Int     @id 
+  name      String
+  logo_url  String?
+  products  Product[] 
 }
